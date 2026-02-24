@@ -4,12 +4,12 @@ import torchvision.models as models
 
 class AIDetector(nn.Module):
     def __init__(self, model_name='resnet50', pretrained=True):
-        """"""
+        """
         Binary classifier for AI vs Human art detection.
         Args:
             model_name (str): Backbone model. Default 'resnet50'.
             pretrained (bool): Whether to use ImageNet pretrained weights.
-        """"""
+        """
         super(AIDetector, self).__init__()
         
         if model_name == 'resnet50':

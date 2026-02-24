@@ -19,10 +19,10 @@ class XAIExplainer:
             self.explainer = Saliency(self.model)
         elif method == 'LayerGradCam':
             if target_layer is None:
-                raise ValueError(\"target_layer must be provided for LayerGradCam.\")
+                raise ValueError("target_layer must be provided for LayerGradCam.")
             self.explainer = LayerGradCam(self.model, target_layer)
         else:
-            raise ValueError(f\"Unknown XAI method {method}\")
+            raise ValueError(f"Unknown XAI method {method}")
             
     def generate_explanation(self, inputs, target):
         """

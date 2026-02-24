@@ -3,10 +3,10 @@ import torch.nn as nn
 from tqdm import tqdm
 import numpy as np
 
-def evaluate_model(model, dataloader, attacker, explainer, device='cuda'):
-    """"""
+def evaluate_model(model, dataloader, attacker, explainer, device='cuda', max_steps=None):
+    """
     Evaluates basic accuracy, adversarial robustness, and explanation shift.
-    """"""
+    """
     model.eval()
     
     clean_correct = 0
@@ -15,7 +15,10 @@ def evaluate_model(model, dataloader, attacker, explainer, device='cuda'):
     
     loop = tqdm(dataloader, desc="Evaluating")
     
-    for images, labels in loop:
+    for i, (images, labels) in enumerate(loop):
+        if max_steps is not None and i >= max_steps:
+            break
+            
         images, labels = images.to(device), labels.to(device)
         
         with torch.no_grad():

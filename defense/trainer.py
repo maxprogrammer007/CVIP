@@ -20,21 +20,26 @@ class RobustTrainer:
         self.attacker = attacker
         self.device = device
 
-    def train_epoch(self, dataloader, use_defense=True, lambda_reg=0.1):
+    def train_epoch(self, dataloader, use_defense=True, lambda_reg=0.1, steps_per_epoch=None):
         """
         Runs one epoch of training.
         Args:
             dataloader: PyTorch train dataloader.
             use_defense: If True, uses the XAI-driven regularization on top of adversarial training.
+            steps_per_epoch (int): Limits number of batches due to infinite streams.
         """
         self.model.train()
         total_loss = 0.0
         total_acc = 0.0
+        batches = 0
         
         self.loss_fn.lambda_reg = lambda_reg if use_defense else 0.0
         
-        loop = tqdm(dataloader, leave=False, desc=\"Training\")
-        for images, labels in loop:
+        loop = tqdm(dataloader, leave=False, desc="Training")
+        for i, (images, labels) in enumerate(loop):
+            if steps_per_epoch is not None and i >= steps_per_epoch:
+                break
+                
             images, labels = images.to(self.device), labels.to(self.device)
             
             # Step 1: Optional adversarial perturbation
@@ -78,7 +83,8 @@ class RobustTrainer:
             preds = torch.argmax(logits, dim=1)
             acc = (preds == labels).float().mean()
             total_acc += acc.item()
+            batches += 1
             
             loop.set_postfix({'loss': loss.item(), 'acc': acc.item(), 'reg': reg_loss.item() if isinstance(reg_loss, torch.Tensor) else reg_loss})
             
-        return total_loss / len(dataloader), total_acc / len(dataloader)
+        return total_loss / max(1, batches), total_acc / max(1, batches)
