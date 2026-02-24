@@ -10,8 +10,11 @@ from eval import evaluate_model
 import argparse
 import os
 
+import os
+
 from data.dataset import AIDetectionDataset, HFStreamingDataset
 from data.transforms import get_transforms
+from utils.visualize import plot_training_curves
 
 def create_dummy_data(num_samples=20, img_size=224):
     """Generates dummy image tensors and labels for testing the pipeline."""
@@ -31,6 +34,7 @@ def main():
     parser.add_argument('--dry_run', action='store_true', help='Use dummy data to test pipeline')
     parser.add_argument('--hf_token', type=str, default=None, help='Hugging Face Token for streaming dataset')
     parser.add_argument('--steps_per_epoch', type=int, default=100, help='Number of batches per epoch (essential for infinite streaming data)')
+    parser.add_argument('--model_name', type=str, default='resnet50', choices=['resnet50', 'efficientnet_b0', 'vit_b_16'], help='Backbone model')
     args = parser.parse_args()
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -69,7 +73,7 @@ def main():
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
     
     # 2. Setup Model, Attacker, Explainer, and Loss
-    model = AIDetector(model_name='resnet50', pretrained=False).to(device)  # False for speed in testing
+    model = AIDetector(model_name=args.model_name, pretrained=not args.dry_run).to(device) 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
     attacker = AdversarialAttacker(model, attack_type='PGD', eps=8/255, alpha=2/255, steps=2)
@@ -81,6 +85,14 @@ def main():
     
     # 3. Setup Trainer
     trainer = RobustTrainer(model, optimizer, loss_fn, explainer, attacker, device=device)
+    
+    # Track metrics for plotting
+    history = {
+        'train_loss': [],
+        'train_acc': [],
+        'val_clean_acc': [],
+        'val_adv_acc': []
+    }
     
     # 4. Training Loop
     for epoch in range(args.epochs):
