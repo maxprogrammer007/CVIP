@@ -20,7 +20,7 @@ class RobustTrainer:
         self.attacker = attacker
         self.device = device
 
-    def train_epoch(self, dataloader, use_defense=True, lambda_reg=0.1, steps_per_epoch=None):
+    def train_epoch(self, dataloader, use_defense=True, lambda_consist=0.1, lambda_suppress=0.0, steps_per_epoch=None):
         """
         Runs one epoch of training.
         Args:
@@ -33,7 +33,8 @@ class RobustTrainer:
         total_acc = 0.0
         batches = 0
         
-        self.loss_fn.lambda_reg = lambda_reg if use_defense else 0.0
+        self.loss_fn.lambda_consist = lambda_consist if use_defense else 0.0
+        self.loss_fn.lambda_suppress = lambda_suppress if use_defense else 0.0
         
         loop = tqdm(dataloader, leave=False, desc="Training")
         for i, (images, labels) in enumerate(loop):
@@ -53,8 +54,7 @@ class RobustTrainer:
                 
             clean_explanations, pert_explanations = None, None
             
-            # Step 2: XAI explanations (requires gradients w.r.t inputs, so model is locally in eval mode
-            # inside explainer. However, for clean implementation and efficiency we only do this if defense is active)
+            # Step 2: XAI explanations
             if use_defense:
                 # Enable gradients on inputs for explainer
                 images.requires_grad = True
@@ -67,12 +67,9 @@ class RobustTrainer:
             self.model.train() # Make sure we are back in train mode
             self.optimizer.zero_grad()
             
-            # Train on the perturbed images (Adversarial Training)
-            # or clean images if no attacker is provided
             logits = self.model(pert_images)
             
-            loss, cls_loss, reg_loss = self.loss_fn(logits, labels, clean_explanations, pert_explanations)
-            
+            loss, cls_loss, reg_loss, supp_loss = self.loss_fn(logits, labels, clean_explanations, pert_explanations)
             
             # Step 4: Backward pass
             loss.backward()
@@ -85,6 +82,10 @@ class RobustTrainer:
             total_acc += acc.item()
             batches += 1
             
-            loop.set_postfix({'loss': loss.item(), 'acc': acc.item(), 'reg': reg_loss.item() if isinstance(reg_loss, torch.Tensor) else reg_loss})
+            # Extract values dynamically 
+            v_reg = reg_loss.item() if isinstance(reg_loss, torch.Tensor) else reg_loss
+            v_supp = supp_loss.item() if isinstance(supp_loss, torch.Tensor) else supp_loss
+            
+            loop.set_postfix({'loss': loss.item(), 'acc': acc.item(), 'reg': v_reg, 'supp': v_supp})
             
         return total_loss / max(1, batches), total_acc / max(1, batches)

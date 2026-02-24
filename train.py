@@ -26,6 +26,8 @@ def main():
     parser.add_argument('--batch_size', type=int, default=4, help='Batch size')
     parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
     parser.add_argument('--use_defense', action='store_true', help='Use XAI-guided defense')
+    parser.add_argument('--lambda_consist', type=float, default=0.1, help='Weight for L1 consistency loss')
+    parser.add_argument('--lambda_suppress', type=float, default=0.5, help='Weight for vulnerability suppression loss')
     parser.add_argument('--dry_run', action='store_true', help='Use dummy data to test pipeline')
     parser.add_argument('--hf_token', type=str, default=None, help='Hugging Face Token for streaming dataset')
     parser.add_argument('--steps_per_epoch', type=int, default=100, help='Number of batches per epoch (essential for infinite streaming data)')
@@ -72,7 +74,10 @@ def main():
     
     attacker = AdversarialAttacker(model, attack_type='PGD', eps=8/255, alpha=2/255, steps=2)
     explainer = XAIExplainer(model, method='IntegratedGradients')
-    loss_fn = ExplanationConsistencyLoss(lambda_reg=0.1)
+    loss_fn = ExplanationConsistencyLoss(
+        lambda_consist=args.lambda_consist, 
+        lambda_suppress=args.lambda_suppress
+    )
     
     # 3. Setup Trainer
     trainer = RobustTrainer(model, optimizer, loss_fn, explainer, attacker, device=device)
@@ -83,6 +88,8 @@ def main():
         train_loss, train_acc = trainer.train_epoch(
             train_loader, 
             use_defense=args.use_defense,
+            lambda_consist=args.lambda_consist,
+            lambda_suppress=args.lambda_suppress,
             steps_per_epoch=args.steps_per_epoch if not args.dry_run else None
         )
         print(f'Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}')
