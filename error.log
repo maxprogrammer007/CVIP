@@ -1,0 +1,95 @@
+C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet50_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet50_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Using device: cuda
+Initializing local dataset (AI-Generated vs Real)...
+\nEpoch 1/1
+Training:   0%|          | 0/125 [00:00<?, ?it/s]                                                 Traceback (most recent call last):
+  File "C:\Users\abhin\OneDrive\Documents\GitHub\CVIP\train.py", line 121, in <module>
+    main()
+  File "C:\Users\abhin\OneDrive\Documents\GitHub\CVIP\train.py", line 97, in main
+    train_loss, train_acc = trainer.train_epoch(
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\OneDrive\Documents\GitHub\CVIP\defense\trainer.py", line 63, in train_epoch
+    clean_explanations = self.explainer.generate_explanation(images, labels)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\OneDrive\Documents\GitHub\CVIP\xai\explainer.py", line 40, in generate_explanation
+    attributions = self.explainer.attribute(inputs, target=target, n_steps=10)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\captum\log\dummy_log.py", line 39, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\captum\attr\_core\integrated_gradients.py", line 289, in attribute
+    attributions = self._attribute(
+                   ^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\captum\attr\_core\integrated_gradients.py", line 368, in _attribute
+    grads = self.gradient_func(
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\captum\_utils\gradient.py", line 128, in compute_gradients
+    outputs = _run_forward(forward_fn, inputs, target_ind, additional_forward_args)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\captum\_utils\common.py", line 588, in _run_forward
+    output = forward_func(
+             ^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\OneDrive\Documents\GitHub\CVIP\models\detector.py", line 33, in forward
+    return self.backbone(x)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\resnet.py", line 285, in forward
+    return self._forward_impl(x)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\resnet.py", line 275, in _forward_impl
+    x = self.layer3(x)
+        ^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\resnet.py", line 158, in forward
+    identity = self.downsample(x)
+               ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\container.py", line 250, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\conv.py", line 554, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\nn\modules\conv.py", line 549, in _conv_forward
+    return F.conv2d(
+           ^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 124.00 MiB. GPU 0 has a total capacity of 4.00 GiB of which 0 bytes is free. Of the allocated memory 10.34 GiB is allocated by PyTorch, and 145.70 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

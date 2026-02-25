@@ -51,6 +51,8 @@ class AIDetectionDataset(Dataset):
 
         if self.transform:
             image = self.transform(image)
+            
+        return image, label
 
 class HFStreamingDataset(IterableDataset):
     def __init__(self, dataset_name="Hemg/AI-Generated-vs-Real-Images-Datasets", split="train", transform=None, token=None):

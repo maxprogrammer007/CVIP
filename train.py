@@ -49,28 +49,25 @@ def main():
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
     else:
-        print('Initializing Hugging Face streaming dataset (AI-Generated vs Real)...')
+        print('Initializing local dataset (AI-Generated vs Real)...')
         # Setting up transforms
         train_transform = get_transforms(img_size=224, is_train=True)
         val_transform = get_transforms(img_size=224, is_train=False)
         
         # Initializing datasets
-        train_dataset = HFStreamingDataset(
-            dataset_name="Hemg/AI-Generated-vs-Real-Images-Datasets", 
+        train_dataset = AIDetectionDataset(
+            root_dir="data/root_dataset", 
             split="train", 
-            transform=train_transform,
-            token=args.hf_token
+            transform=train_transform
         )
-        val_dataset = HFStreamingDataset(
-            dataset_name="Hemg/AI-Generated-vs-Real-Images-Datasets", 
-            split="train", 
-            transform=val_transform,
-            token=args.hf_token
+        val_dataset = AIDetectionDataset(
+            root_dir="data/root_dataset", 
+            split="val", 
+            transform=val_transform
         )
         
-        # For IterableDatasets, we don't shuffle via DataLoader, we just load in sequence
-        train_loader = DataLoader(train_dataset, batch_size=args.batch_size)
-        val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
+        train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+        val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
     
     # 2. Setup Model, Attacker, Explainer, and Loss
     model = AIDetector(model_name=args.model_name, pretrained=not args.dry_run).to(device) 
