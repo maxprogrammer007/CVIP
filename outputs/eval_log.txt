@@ -1,0 +1,56 @@
+C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\torchvision\models\_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet50_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet50_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Using device: cuda
+Test set: 200 samples
+Evaluating:   0%|          | 0/100 [00:00<?, ?it/s]Evaluating:   1%|1         | 1/100 [00:04<07:53,  4.79s/it]Evaluating:   2%|2         | 2/100 [00:05<03:46,  2.31s/it]Evaluating:   3%|3         | 3/100 [00:05<02:26,  1.51s/it]Evaluating:   4%|4         | 4/100 [00:06<01:49,  1.14s/it]Evaluating:   5%|5         | 5/100 [00:07<01:29,  1.06it/s]Evaluating:   6%|6         | 6/100 [00:07<01:16,  1.22it/s]Evaluating:   7%|7         | 7/100 [00:08<01:08,  1.35it/s]Evaluating:   8%|8         | 8/100 [00:08<01:02,  1.47it/s]Evaluating:   9%|9         | 9/100 [00:09<00:59,  1.53it/s]Evaluating:  10%|#         | 10/100 [00:09<00:56,  1.58it/s]Evaluating:  11%|#1        | 11/100 [00:10<00:54,  1.64it/s]Evaluating:  12%|#2        | 12/100 [00:11<00:52,  1.69it/s]Evaluating:  13%|#3        | 13/100 [00:11<00:50,  1.73it/s]Evaluating:  14%|#4        | 14/100 [00:12<00:48,  1.76it/s]Evaluating:  15%|#5        | 15/100 [00:12<00:47,  1.77it/s]Evaluating:  16%|#6        | 16/100 [00:13<00:46,  1.79it/s]Evaluating:  17%|#7        | 17/100 [00:13<00:46,  1.80it/s]Evaluating:  18%|#8        | 18/100 [00:14<00:45,  1.80it/s]Evaluating:  19%|#9        | 19/100 [00:14<00:45,  1.80it/s]Evaluating:  20%|##        | 20/100 [00:15<00:45,  1.77it/s]Evaluating:  21%|##1       | 21/100 [00:16<00:44,  1.78it/s]Evaluating:  22%|##2       | 22/100 [00:16<00:44,  1.76it/s]Evaluating:  23%|##3       | 23/100 [00:17<00:44,  1.74it/s]Evaluating:  24%|##4       | 24/100 [00:17<00:43,  1.73it/s]Evaluating:  25%|##5       | 25/100 [00:18<00:43,  1.72it/s]Evaluating:  26%|##6       | 26/100 [00:19<00:43,  1.70it/s]Evaluating:  27%|##7       | 27/100 [00:19<00:42,  1.71it/s]Evaluating:  28%|##8       | 28/100 [00:20<00:42,  1.71it/s]Evaluating:  29%|##9       | 29/100 [00:20<00:41,  1.73it/s]Evaluating:  30%|###       | 30/100 [00:21<00:40,  1.71it/s]Evaluating:  31%|###1      | 31/100 [00:21<00:40,  1.72it/s]Evaluating:  32%|###2      | 32/100 [00:22<00:39,  1.73it/s]Evaluating:  33%|###3      | 33/100 [00:23<00:38,  1.73it/s]Evaluating:  34%|###4      | 34/100 [00:23<00:38,  1.70it/s]Evaluating:  35%|###5      | 35/100 [00:24<00:38,  1.68it/s]Evaluating:  36%|###6      | 36/100 [00:24<00:37,  1.70it/s]Evaluating:  37%|###7      | 37/100 [00:25<00:36,  1.71it/s]Evaluating:  38%|###8      | 38/100 [00:26<00:36,  1.70it/s]Evaluating:  39%|###9      | 39/100 [00:26<00:36,  1.65it/s]Evaluating:  40%|####      | 40/100 [00:27<00:36,  1.65it/s]Evaluating:  41%|####1     | 41/100 [00:27<00:35,  1.68it/s]Evaluating:  42%|####2     | 42/100 [00:28<00:34,  1.70it/s]Evaluating:  43%|####3     | 43/100 [00:29<00:33,  1.72it/s]Evaluating:  44%|####4     | 44/100 [00:29<00:33,  1.69it/s]Evaluating:  45%|####5     | 45/100 [00:30<00:32,  1.68it/s]Evaluating:  46%|####6     | 46/100 [00:30<00:32,  1.67it/s]Evaluating:  47%|####6     | 47/100 [00:31<00:31,  1.67it/s]Evaluating:  48%|####8     | 48/100 [00:32<00:31,  1.67it/s]Evaluating:  49%|####9     | 49/100 [00:32<00:30,  1.66it/s]Evaluating:  50%|#####     | 50/100 [00:33<00:29,  1.68it/s]Evaluating:  51%|#####1    | 51/100 [00:33<00:28,  1.70it/s]Evaluating:  52%|#####2    | 52/100 [00:34<00:27,  1.72it/s]Evaluating:  53%|#####3    | 53/100 [00:34<00:27,  1.73it/s]Evaluating:  54%|#####4    | 54/100 [00:35<00:26,  1.74it/s]Evaluating:  55%|#####5    | 55/100 [00:36<00:25,  1.73it/s]Evaluating:  56%|#####6    | 56/100 [00:36<00:24,  1.76it/s]Evaluating:  57%|#####6    | 57/100 [00:37<00:24,  1.78it/s]Evaluating:  58%|#####8    | 58/100 [00:37<00:23,  1.79it/s]Evaluating:  59%|#####8    | 59/100 [00:38<00:22,  1.80it/s]Evaluating:  60%|######    | 60/100 [00:38<00:22,  1.82it/s]Evaluating:  61%|######1   | 61/100 [00:39<00:21,  1.83it/s]Evaluating:  62%|######2   | 62/100 [00:39<00:21,  1.78it/s]Evaluating:  63%|######3   | 63/100 [00:40<00:21,  1.76it/s]Evaluating:  64%|######4   | 64/100 [00:41<00:20,  1.73it/s]Evaluating:  65%|######5   | 65/100 [00:41<00:21,  1.66it/s]Evaluating:  66%|######6   | 66/100 [00:42<00:20,  1.67it/s]Evaluating:  67%|######7   | 67/100 [00:42<00:19,  1.67it/s]Evaluating:  68%|######8   | 68/100 [00:43<00:19,  1.65it/s]Evaluating:  69%|######9   | 69/100 [00:44<00:18,  1.65it/s]Evaluating:  70%|#######   | 70/100 [00:44<00:17,  1.67it/s]Evaluating:  71%|#######1  | 71/100 [00:45<00:17,  1.67it/s]Evaluating:  72%|#######2  | 72/100 [00:45<00:16,  1.68it/s]Evaluating:  73%|#######3  | 73/100 [00:46<00:16,  1.68it/s]Evaluating:  74%|#######4  | 74/100 [00:47<00:15,  1.70it/s]Evaluating:  75%|#######5  | 75/100 [00:47<00:14,  1.71it/s]Evaluating:  76%|#######6  | 76/100 [00:48<00:14,  1.71it/s]Evaluating:  77%|#######7  | 77/100 [00:48<00:13,  1.70it/s]Evaluating:  78%|#######8  | 78/100 [00:49<00:13,  1.69it/s]Evaluating:  79%|#######9  | 79/100 [00:50<00:12,  1.64it/s]Evaluating:  80%|########  | 80/100 [00:50<00:12,  1.63it/s]Evaluating:  81%|########1 | 81/100 [00:51<00:11,  1.63it/s]Evaluating:  82%|########2 | 82/100 [00:51<00:11,  1.63it/s]Evaluating:  83%|########2 | 83/100 [00:52<00:10,  1.60it/s]Evaluating:  84%|########4 | 84/100 [00:53<00:10,  1.59it/s]Evaluating:  85%|########5 | 85/100 [00:53<00:09,  1.55it/s]Evaluating:  86%|########6 | 86/100 [00:54<00:09,  1.55it/s]Evaluating:  87%|########7 | 87/100 [00:55<00:08,  1.55it/s]Evaluating:  88%|########8 | 88/100 [00:55<00:07,  1.55it/s]Evaluating:  89%|########9 | 89/100 [00:56<00:07,  1.54it/s]Evaluating:  90%|######### | 90/100 [00:57<00:06,  1.54it/s]Evaluating:  91%|#########1| 91/100 [00:57<00:05,  1.56it/s]Evaluating:  92%|#########2| 92/100 [00:58<00:05,  1.59it/s]Evaluating:  93%|#########3| 93/100 [00:59<00:04,  1.60it/s]Evaluating:  94%|#########3| 94/100 [00:59<00:03,  1.64it/s]Evaluating:  95%|#########5| 95/100 [01:00<00:02,  1.67it/s]Evaluating:  96%|#########6| 96/100 [01:00<00:02,  1.67it/s]Evaluating:  97%|#########7| 97/100 [01:01<00:01,  1.69it/s]Evaluating:  98%|#########8| 98/100 [01:01<00:01,  1.68it/s]Evaluating:  99%|#########9| 99/100 [01:02<00:00,  1.67it/s]Evaluating: 100%|##########| 100/100 [01:03<00:00,  1.59it/s]Evaluating: 100%|##########| 100/100 [01:03<00:00,  1.58it/s]
+C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\metrics\_ranking.py:1179: UndefinedMetricWarning: No negative samples in y_true, false positive value should be meaningless
+  warnings.warn(
+C:\Users\abhin\AppData\Local\Programs\Python\Python312\Lib\site-packages\sklearn\metrics\_ranking.py:1179: UndefinedMetricWarning: No negative samples in y_true, false positive value should be meaningless
+  warnings.warn(
+Saved XAI comparison plot to outputs\xai_comparison.png
+
+--- Clean Classification Report ---
+              precision    recall  f1-score   support
+
+       Human       0.00      0.00      0.00         0
+          AI       1.00      0.81      0.90       200
+
+    accuracy                           0.81       200
+   macro avg       0.50      0.41      0.45       200
+weighted avg       1.00      0.81      0.90       200
+
+--- Adversarial Classification Report ---
+              precision    recall  f1-score   support
+
+       Human       0.00      0.00      0.00         0
+          AI       1.00      0.08      0.15       200
+
+    accuracy                           0.08       200
+   macro avg       0.50      0.04      0.07       200
+weighted avg       1.00      0.08      0.15       200
+
+
+Clean AUC-ROC:        nan
+Adversarial AUC-ROC:  nan
+
+Clean Macro F1:        0.4490
+Clean Macro Precision: 0.5000
+Clean Macro Recall:    0.4075
+
+Adv Macro F1:          0.0741
+Adv Macro Precision:   0.5000
+Adv Macro Recall:      0.0400
+
+Mean XAI Shift (L2):  1.4514 ± 0.3755
+Saved confusion matrix plot to outputs\cm_clean.png
+Saved confusion matrix plot to outputs\cm_adversarial.png
+Saved ROC curve plot to outputs\roc_curve.png
+
+=== Summary ===
+Clean Accuracy:         0.8150
+Adversarial Accuracy:   0.0800
+Robustness Drop:        0.7350
+
+Plots saved to: outputs/

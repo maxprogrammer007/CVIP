@@ -1,5 +1,6 @@
 import torch
 from tqdm import tqdm
+from data.transforms import apply_style_mix
 
 class RobustTrainer:
     def __init__(self, model, optimizer, loss_fn, explainer, attacker, device='cuda'):
@@ -20,7 +21,8 @@ class RobustTrainer:
         self.attacker = attacker
         self.device = device
 
-    def train_epoch(self, dataloader, use_defense=True, lambda_consist=0.1, lambda_suppress=0.0, steps_per_epoch=None):
+    def train_epoch(self, dataloader, use_defense=True, lambda_consist=0.1, lambda_suppress=0.0, 
+                    lambda_contrast=0.1, lambda_triplet=0.5, lambda_squeeze=0.1, steps_per_epoch=None):
         """
         Runs one epoch of training.
         Args:
@@ -31,10 +33,14 @@ class RobustTrainer:
         self.model.train()
         total_loss = 0.0
         total_acc = 0.0
+        total_stability = 0.0 # Track metric: how consistent the explanations are
         batches = 0
         
         self.loss_fn.lambda_consist = lambda_consist if use_defense else 0.0
         self.loss_fn.lambda_suppress = lambda_suppress if use_defense else 0.0
+        self.loss_fn.lambda_contrast = lambda_contrast if use_defense else 0.0
+        self.loss_fn.lambda_triplet = lambda_triplet if use_defense else 0.0
+        self.loss_fn.lambda_squeeze = lambda_squeeze if use_defense else 0.0
         
         loop = tqdm(dataloader, leave=False, desc="Training")
         for i, (images, labels) in enumerate(loop):
@@ -42,6 +48,9 @@ class RobustTrainer:
                 break
                 
             images, labels = images.to(self.device), labels.to(self.device)
+            
+            # Apply Style-Mix augmentation
+            images = apply_style_mix(images, labels)
             
             # Step 1: Optional adversarial perturbation
             if self.attacker is not None:
@@ -53,23 +62,70 @@ class RobustTrainer:
                 pert_images = images
                 
             clean_explanations, pert_explanations = None, None
+            clean_features, pert_features = None, None
+            stability = 1.0 # default
             
-            # Step 2: XAI explanations
+            # Step 2: XAI explanations and feature extraction
             if use_defense:
                 # Enable gradients on inputs for explainer
                 images.requires_grad = True
                 pert_images.requires_grad = True
                 
-                clean_explanations = self.explainer.generate_explanation(images, labels)
-                pert_explanations = self.explainer.generate_explanation(pert_images, labels)
+                # Use SmoothGrad (nt_samples=5) for stable masking
+                clean_explanations = self.explainer.generate_explanation(images, labels, nt_samples=5)
+                pert_explanations = self.explainer.generate_explanation(pert_images, labels, nt_samples=5)
                 
-            # Step 3: Forward pass and loss calculation
-            self.model.train() # Make sure we are back in train mode
+                # Feature extraction for contrastive alignment
+                clean_features = self.model.extract_features(images)
+                pert_features = self.model.extract_features(pert_images)
+                
+                # Dynamic Uncertainty-Based Masking
+                with torch.no_grad():
+                    # Fragile regions: where shift is highest
+                    vuln_mask = torch.abs(pert_explanations - clean_explanations)
+                    stability = 1.0 - (vuln_mask.view(vuln_mask.size(0), -1).mean(dim=1).mean().item())
+                    
+                    # Normalize maps
+                    mask_max = vuln_mask.view(vuln_mask.size(0), -1).max(dim=1)[0].view(-1, 1, 1, 1) + 1e-8
+                    vuln_mask = vuln_mask / mask_max
+                    
+                    # Semantic Priority: Clean map high attribution regions
+                    # We protect the top attribution regions of the clean map
+                    clean_max = clean_explanations.view(clean_explanations.size(0), -1).max(dim=1)[0].view(-1, 1, 1, 1) + 1e-8
+                    clean_norm = clean_explanations / clean_max
+                    
+                    # Adaptive Floor: protect regions with > 0.5 normalized clean attribution
+                    adaptive_floor = (clean_norm > 0.5).float()
+                    
+                    # effective_mask = (1 - fragile) + semantic_important
+                    effective_mask = torch.clamp((1.0 - vuln_mask) + adaptive_floor, 0.0, 1.0)
+                    masked_pert_images = pert_images * effective_mask
+            else:
+                masked_pert_images = pert_images
+                
+            # Step 3: Hardened 50/50 Adversarial Training
+            # We mix half clean and half masked-perturbed for the main labels
+            B = images.size(0)
+            if B >= 2:
+                # Randomly select 50% indices to be adversarial
+                adv_idx = torch.randperm(B)[:B//2]
+                mixed_train_images = images.clone()
+                mixed_train_images[adv_idx] = masked_pert_images[adv_idx]
+            else:
+                mixed_train_images = masked_pert_images
+                
+            # Forward pass
+            self.model.train() 
             self.optimizer.zero_grad()
             
-            logits = self.model(pert_images)
+            logits = self.model(mixed_train_images)
             
-            loss, cls_loss, reg_loss, supp_loss = self.loss_fn(logits, labels, clean_explanations, pert_explanations)
+            # Expanded return from updated loss_fn (Triplet, Squeeze)
+            loss, cls_loss, reg_loss, supp_loss, contrast_loss, triplet_loss, squeeze_loss = self.loss_fn(
+                logits, labels, 
+                clean_explanations, pert_explanations,
+                clean_features, pert_features
+            )
             
             # Step 4: Backward pass
             loss.backward()
@@ -80,12 +136,19 @@ class RobustTrainer:
             preds = torch.argmax(logits, dim=1)
             acc = (preds == labels).float().mean()
             total_acc += acc.item()
+            total_stability += stability
             batches += 1
             
             # Extract values dynamically 
-            v_reg = reg_loss.item() if isinstance(reg_loss, torch.Tensor) else reg_loss
-            v_supp = supp_loss.item() if isinstance(supp_loss, torch.Tensor) else supp_loss
+            v_trip = triplet_loss.item() if isinstance(triplet_loss, torch.Tensor) else triplet_loss
+            v_sqz = squeeze_loss.item() if isinstance(squeeze_loss, torch.Tensor) else squeeze_loss
             
-            loop.set_postfix({'loss': loss.item(), 'acc': acc.item(), 'reg': v_reg, 'supp': v_supp})
+            loop.set_postfix({
+                'loss': f"{loss.item():.3f}", 
+                'acc': f"{acc.item():.3f}", 
+                'stab': f"{stability:.3f}",
+                'trip': f"{v_trip:.3f}",
+                'sqz': f"{v_sqz:.3f}"
+            })
             
-        return total_loss / max(1, batches), total_acc / max(1, batches)
+        return total_loss / max(1, batches), total_acc / max(1, batches), total_stability / max(1, batches)

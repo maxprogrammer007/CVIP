@@ -24,20 +24,27 @@ class XAIExplainer:
         else:
             raise ValueError(f"Unknown XAI method {method}")
             
-    def generate_explanation(self, inputs, target):
+    def generate_explanation(self, inputs, target, nt_samples=1):
         """
         Generates explanation map for the given inputs.
         Args:
             inputs: Tensor of shape (B, C, H, W)
             target: Target class index (e.g., 1 for AI-generated)
+            nt_samples: If > 1, use noise tunnel (SmoothGrad) for stabilization.
         Returns:
             attributions: Explanations having same shape as inputs (or spatial size for GradCam)
         """
         self.model.eval() # Ensure model is in eval mode for XAI
         
-        if self.method in ['IntegratedGradients']:
-            # Use sensible baseline (e.g. zeros) and limited steps for speed in training
-            attributions = self.explainer.attribute(inputs, target=target, n_steps=10)
+        if self.method == 'IntegratedGradients':
+            if nt_samples > 1:
+                from captum.attr import NoiseTunnel
+                nt = NoiseTunnel(self.explainer)
+                # Optimize samples/steps for faster training while maintaining stabilization
+                attributions = nt.attribute(inputs, target=target, nt_type='smoothgrad', 
+                                            nt_samples=2, stdevs=0.1, n_steps=3)
+            else:
+                attributions = self.explainer.attribute(inputs, target=target, n_steps=10)
         elif self.method == 'Saliency':
             attributions = self.explainer.attribute(inputs, target=target)
         elif self.method == 'LayerGradCam':

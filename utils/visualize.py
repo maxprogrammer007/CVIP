@@ -100,3 +100,89 @@ def plot_training_curves(train_losses, train_accs, val_clean_accs, val_adv_accs,
     plt.savefig(save_path)
     plt.close()
     print(f"Saved training curves plot to {save_path}")
+
+
+def plot_confusion_matrix(cm, class_names, title="Confusion Matrix", save_path="outputs/cm.png"):
+    """
+    Plots a color-coded confusion matrix.
+    Args:
+        cm: 2D numpy array from sklearn.metrics.confusion_matrix
+        class_names: list of class label strings
+        title: plot title
+        save_path: path to save the figure
+    """
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    import matplotlib.ticker as ticker
+
+    fig, ax = plt.subplots(figsize=(6, 5))
+    im = ax.imshow(cm, interpolation='nearest', cmap='Blues')
+    plt.colorbar(im, ax=ax)
+
+    ax.set_title(title, fontsize=14, fontweight='bold', pad=12)
+    ax.set_xlabel('Predicted Label', fontsize=11)
+    ax.set_ylabel('True Label', fontsize=11)
+
+    tick_marks = np.arange(len(class_names))
+    ax.set_xticks(tick_marks)
+    ax.set_xticklabels(class_names)
+    ax.set_yticks(tick_marks)
+    ax.set_yticklabels(class_names)
+
+    # Annotate cells with counts
+    thresh = cm.max() / 2.0
+    for r in range(cm.shape[0]):
+        for c in range(cm.shape[1]):
+            ax.text(c, r, format(cm[r, c], 'd'),
+                    ha='center', va='center',
+                    color='white' if cm[r, c] > thresh else 'black',
+                    fontsize=12)
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"Saved confusion matrix plot to {save_path}")
+
+
+def plot_roc_curve(labels, clean_probs, adv_probs=None, save_path="outputs/roc_curve.png"):
+    """
+    Plots clean (and optionally adversarial) ROC curves with AUC annotations.
+    Args:
+        labels: ground truth binary labels (numpy array)
+        clean_probs: model confidence for the positive class on clean images
+        adv_probs: model confidence for the positive class on adversarial images (optional)
+        save_path: path to save the figure
+    """
+    from sklearn.metrics import roc_curve, auc
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(7, 6))
+
+    # Clean ROC
+    fpr_c, tpr_c, _ = roc_curve(labels, clean_probs)
+    auc_c = auc(fpr_c, tpr_c)
+    ax.plot(fpr_c, tpr_c, color='steelblue', lw=2, label=f"Clean (AUC = {auc_c:.3f})")
+
+    # Adversarial ROC
+    if adv_probs is not None:
+        fpr_a, tpr_a, _ = roc_curve(labels, adv_probs)
+        auc_a = auc(fpr_a, tpr_a)
+        ax.plot(fpr_a, tpr_a, color='tomato', lw=2, linestyle='--',
+                label=f"Adversarial (AUC = {auc_a:.3f})")
+
+    # Diagonal baseline
+    ax.plot([0, 1], [0, 1], 'k--', lw=1, label='Random Classifier')
+
+    ax.set_xlim([0.0, 1.0])
+    ax.set_ylim([0.0, 1.05])
+    ax.set_xlabel('False Positive Rate', fontsize=11)
+    ax.set_ylabel('True Positive Rate', fontsize=11)
+    ax.set_title('ROC Curve: Clean vs Adversarial', fontsize=13, fontweight='bold')
+    ax.legend(loc='lower right', fontsize=10)
+    ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"Saved ROC curve plot to {save_path}")
+
