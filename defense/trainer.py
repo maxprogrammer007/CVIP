@@ -21,8 +21,7 @@ class RobustTrainer:
         self.attacker = attacker
         self.device = device
 
-    def train_epoch(self, dataloader, use_defense=True, lambda_consist=0.1, lambda_suppress=0.0, 
-                    lambda_contrast=0.1, lambda_triplet=0.5, lambda_squeeze=0.1, steps_per_epoch=None):
+    def train_epoch(self, dataloader, use_defense=True, lambda_consist=0.1, lambda_suppress=0.0, lambda_contrast=0.1, steps_per_epoch=None):
         """
         Runs one epoch of training.
         Args:
@@ -39,8 +38,6 @@ class RobustTrainer:
         self.loss_fn.lambda_consist = lambda_consist if use_defense else 0.0
         self.loss_fn.lambda_suppress = lambda_suppress if use_defense else 0.0
         self.loss_fn.lambda_contrast = lambda_contrast if use_defense else 0.0
-        self.loss_fn.lambda_triplet = lambda_triplet if use_defense else 0.0
-        self.loss_fn.lambda_squeeze = lambda_squeeze if use_defense else 0.0
         
         loop = tqdm(dataloader, leave=False, desc="Training")
         for i, (images, labels) in enumerate(loop):
@@ -71,9 +68,8 @@ class RobustTrainer:
                 images.requires_grad = True
                 pert_images.requires_grad = True
                 
-                # Use SmoothGrad (nt_samples=5) for stable masking
-                clean_explanations = self.explainer.generate_explanation(images, labels, nt_samples=5)
-                pert_explanations = self.explainer.generate_explanation(pert_images, labels, nt_samples=5)
+                clean_explanations = self.explainer.generate_explanation(images, labels)
+                pert_explanations = self.explainer.generate_explanation(pert_images, labels)
                 
                 # Feature extraction for contrastive alignment
                 clean_features = self.model.extract_features(images)
@@ -120,8 +116,8 @@ class RobustTrainer:
             
             logits = self.model(mixed_train_images)
             
-            # Expanded return from updated loss_fn (Triplet, Squeeze)
-            loss, cls_loss, reg_loss, supp_loss, contrast_loss, triplet_loss, squeeze_loss = self.loss_fn(
+            # Expanded return from updated loss_fn
+            loss, cls_loss, reg_loss, supp_loss, contrast_loss = self.loss_fn(
                 logits, labels, 
                 clean_explanations, pert_explanations,
                 clean_features, pert_features
@@ -140,15 +136,15 @@ class RobustTrainer:
             batches += 1
             
             # Extract values dynamically 
-            v_trip = triplet_loss.item() if isinstance(triplet_loss, torch.Tensor) else triplet_loss
-            v_sqz = squeeze_loss.item() if isinstance(squeeze_loss, torch.Tensor) else squeeze_loss
+            v_reg = reg_loss.item() if isinstance(reg_loss, torch.Tensor) else reg_loss
+            v_supp = supp_loss.item() if isinstance(supp_loss, torch.Tensor) else supp_loss
+            v_cont = contrast_loss.item() if isinstance(contrast_loss, torch.Tensor) else contrast_loss
             
             loop.set_postfix({
                 'loss': f"{loss.item():.3f}", 
                 'acc': f"{acc.item():.3f}", 
                 'stab': f"{stability:.3f}",
-                'trip': f"{v_trip:.3f}",
-                'sqz': f"{v_sqz:.3f}"
+                'crit': f"{v_reg+v_cont:.3f}"
             })
             
         return total_loss / max(1, batches), total_acc / max(1, batches), total_stability / max(1, batches)

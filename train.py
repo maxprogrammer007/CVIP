@@ -27,12 +27,10 @@ def main():
     parser.add_argument('--batch_size', type=int, default=2, help='Batch size')
     parser.add_argument('--lr', type=float, default=1e-5, help='Learning rate')
     parser.add_argument('--use_defense', action='store_true', help='Use XAI-guided defense')
-    parser.add_argument('--lambda_consist', type=float, default=0.8, help='Weight for L1 consistency loss')
+    parser.add_argument('--lambda_consist', type=float, default=0.5, help='Weight for L1 consistency loss')
     parser.add_argument('--lambda_suppress', type=float, default=0.5, help='Weight for vulnerability suppression loss')
     parser.add_argument('--lambda_contrast', type=float, default=0.1, help='Weight for feature contrastive alignment')
-    parser.add_argument('--lambda_triplet', type=float, default=0.5, help='Weight for triplet margin loss')
-    parser.add_argument('--lambda_squeeze', type=float, default=0.1, help='Weight for logit squeezing')
-    parser.add_argument('--ai_weight', type=float, default=1.4, help='Cross-entropy weight for AI class to penalize false positives')
+    parser.add_argument('--ai_weight', type=float, default=1.2, help='Cross-entropy weight for AI class to penalize false positives')
     parser.add_argument('--dry_run', action='store_true', help='Use dummy data to test pipeline')
     parser.add_argument('--hf_token', type=str, default=None, help='Hugging Face Token for streaming dataset')
     parser.add_argument('--steps_per_epoch', type=int, default=None, help='Limit batches per epoch (None = use full dataset)')
@@ -76,7 +74,7 @@ def main():
     model = AIDetector(model_name=args.model_name, pretrained=not args.dry_run).to(device) 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     
-    attacker = AdversarialAttacker(model, attack_type='PGD', eps=8/255, alpha=2/255, steps=5)
+    attacker = AdversarialAttacker(model, attack_type='PGD', eps=8/255, alpha=2/255, steps=2)
     explainer = XAIExplainer(model, method='IntegratedGradients')
     
     # Apply class weights to combat AI-detection false negative bias
@@ -86,8 +84,6 @@ def main():
         lambda_consist=args.lambda_consist, 
         lambda_suppress=args.lambda_suppress,
         lambda_contrast=args.lambda_contrast,
-        lambda_triplet=args.lambda_triplet,
-        lambda_squeeze=args.lambda_squeeze,
         class_weights=class_weights
     )
     
@@ -112,8 +108,6 @@ def main():
             lambda_consist=args.lambda_consist,
             lambda_suppress=args.lambda_suppress,
             lambda_contrast=args.lambda_contrast,
-            lambda_triplet=args.lambda_triplet,
-            lambda_squeeze=args.lambda_squeeze,
             steps_per_epoch=args.steps_per_epoch
         )
         print(f'Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f} | Exp Stability: {train_stab:.4f}')
